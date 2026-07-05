@@ -1,0 +1,6 @@
+{
+  "name": "BTC Trading Journal",
+  "description": "Nhật ký mua bán Bitcoin (BTC) giúp theo dõi biến động giá, tính toán giá mua trung bình (DCA) và thống kê lợi nhuận theo thời gian thực.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
