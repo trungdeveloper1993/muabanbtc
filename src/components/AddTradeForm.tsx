@@ -207,13 +207,17 @@ export default function AddTradeForm({ onAddTrade, currentPrice, currentHoldings
         </div>
       )}
 
-      {/* Salmon pink action button */}
+      {/* Action button: label & color reflect trade type */}
       <button
         type="submit"
-        className="w-full py-4 rounded-2xl font-sans font-bold text-sm tracking-wide text-white bg-rose-400 hover:bg-rose-500 active:scale-[0.99] transition-all cursor-pointer shadow-sm shadow-rose-100 flex items-center justify-center gap-2"
+        className={`w-full py-4 rounded-2xl font-sans font-bold text-sm tracking-wide text-white active:scale-[0.99] transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 ${
+          type === 'BUY'
+            ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100'
+            : 'bg-rose-400 hover:bg-rose-500 shadow-rose-100'
+        }`}
       >
         <Wallet className="w-4 h-4" />
-        Lưu vào nhật ký
+        {type === 'BUY' ? 'MUA' : 'BÁN'}
       </button>
 
     </form>
