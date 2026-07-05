@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // Base path for GitHub Pages project site: https://<user>.github.io/muabanbtc/
+    base: process.env.GITHUB_PAGES === 'true' ? '/muabanbtc/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
