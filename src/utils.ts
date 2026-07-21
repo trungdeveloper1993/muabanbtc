@@ -18,15 +18,17 @@ export function calculatePortfolio(trades: Trade[], currentPrice: number): Portf
   let currentHoldings = 0;
   let averageBuyPrice = 0;
   let realizedPL = 0;
+  let totalBought = 0; // Cumulative cost basis of every BUY (for lifetime ROI)
 
   for (const trade of sortedTrades) {
     const tradeFee = trade.fee || 0;
     if (trade.type === 'BUY') {
       const newHoldings = currentHoldings + trade.amount;
+      const newCostBasis = trade.amount * trade.price + tradeFee;
+      totalBought += newCostBasis;
       if (newHoldings > 0) {
         // Average cost = (old cost + new cost) / total holdings
         const oldCostBasis = currentHoldings * averageBuyPrice;
-        const newCostBasis = trade.amount * trade.price + tradeFee;
         averageBuyPrice = (oldCostBasis + newCostBasis) / newHoldings;
       } else {
         averageBuyPrice = 0;
@@ -59,6 +61,12 @@ export function calculatePortfolio(trades: Trade[], currentPrice: number): Portf
   const unrealizedPL = currentValue - totalSpent;
   const unrealizedPLPercentage = totalSpent > 0 ? (unrealizedPL / totalSpent) * 100 : 0;
 
+  // Total P/L combines already-realized gains/losses (from sells) with the
+  // unrealized P/L on remaining holdings. This is the figure that stays correct
+  // even after selling BTC at a loss (or after selling everything).
+  const totalPL = realizedPL + unrealizedPL;
+  const totalPLPercentage = totalBought > 0 ? (totalPL / totalBought) * 100 : 0;
+
   return {
     currentHoldings,
     totalSpent,
@@ -67,6 +75,8 @@ export function calculatePortfolio(trades: Trade[], currentPrice: number): Portf
     unrealizedPL,
     unrealizedPLPercentage,
     realizedPL,
+    totalPL,
+    totalPLPercentage,
     totalInvested: totalSpent,
   };
 }
