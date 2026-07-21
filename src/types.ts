@@ -24,6 +24,8 @@ export interface PortfolioSummary {
   unrealizedPL: number; // Current profit/loss in USD
   unrealizedPLPercentage: number; // ROI % for current holdings
   realizedPL: number; // Realized profit/loss from sold holdings
+  totalPL: number; // Combined realized + unrealized profit/loss in USD
+  totalPLPercentage: number; // ROI % over all capital ever invested
   totalInvested: number; // Total cash currently locked in (or historical max cash active)
 }
 

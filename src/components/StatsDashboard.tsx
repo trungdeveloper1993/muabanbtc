@@ -14,7 +14,11 @@ interface StatsDashboardProps {
 }
 
 export default function StatsDashboard({ stats, tradesCount, currentPrice }: StatsDashboardProps) {
-  const isProfit = stats.unrealizedPL >= 0;
+  // Headline reflects TOTAL P/L = realized (from sells) + unrealized (on holdings),
+  // so a loss booked by selling BTC is always counted.
+  const isProfit = stats.totalPL >= 0;
+  const isRealizedProfit = stats.realizedPL >= 0;
+  const isUnrealizedProfit = stats.unrealizedPL >= 0;
 
   // Render stats matching the mockup precisely
   return (
@@ -109,10 +113,10 @@ export default function StatsDashboard({ stats, tradesCount, currentPrice }: Sta
             <p className="text-xs text-gray-400 font-sans leading-relaxed mt-0.5">
               {stats.currentHoldings > 0 ? (
                 <>
-                  So giá vốn TB ({formatUSD(stats.averageBuyPrice, 2)}) với giá BTC thế giới hiện tại ({formatUSD(currentPrice, 2)}).
+                  Tổng lãi/lỗ = đã chốt khi bán + tạm tính trên số BTC đang giữ (giá vốn TB {formatUSD(stats.averageBuyPrice, 2)} so với giá hiện tại {formatUSD(currentPrice, 2)}).
                 </>
               ) : (
-                'Hãy thêm các lệnh mua/bán BTC vào nhật ký để theo dõi biến động lời lỗ thời gian thực.'
+                'Tổng lãi/lỗ đã chốt từ các lệnh bán BTC. Hãy thêm giao dịch để theo dõi biến động lời lỗ thời gian thực.'
               )}
             </p>
           </div>
@@ -123,18 +127,43 @@ export default function StatsDashboard({ stats, tradesCount, currentPrice }: Sta
           <span className={`font-mono text-4xl font-black tracking-tight leading-none ${
             isProfit ? 'text-emerald-600' : 'text-rose-600'
           }`}>
-            {isProfit ? '+' : ''}{formatUSD(stats.unrealizedPL, 2)}
+            {isProfit ? '+' : ''}{formatUSD(stats.totalPL, 2)}
           </span>
           <span className={`font-mono text-base font-extrabold mt-2 ${
             isProfit ? 'text-emerald-500' : 'text-rose-500'
           }`}>
-            {formatPercent(stats.unrealizedPLPercentage)}
+            {formatPercent(stats.totalPLPercentage)}
           </span>
+        </div>
+
+        {/* Breakdown: realized (from sells) vs unrealized (on holdings) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Box: LÃI/LỖ ĐÃ CHỐT */}
+          <div className="bg-white rounded-2xl border border-gray-100/80 p-5 flex flex-col gap-1.5 shadow-sm">
+            <span className="text-gray-400 text-[10px] font-extrabold tracking-widest uppercase">
+              LÃI/LỖ ĐÃ CHỐT (BÁN)
+            </span>
+            <span className={`font-mono text-lg font-black ${isRealizedProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {isRealizedProfit ? '+' : ''}{formatUSD(stats.realizedPL, 2)}
+            </span>
+          </div>
+
+          {/* Box: LÃI/LỖ TẠM TÍNH */}
+          <div className="bg-white rounded-2xl border border-gray-100/80 p-5 flex flex-col gap-1.5 shadow-sm">
+            <span className="text-gray-400 text-[10px] font-extrabold tracking-widest uppercase">
+              LÃI/LỖ TẠM TÍNH (ĐANG GIỮ)
+            </span>
+            <span className={`font-mono text-lg font-black ${isUnrealizedProfit ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {stats.currentHoldings > 0 ? `${isUnrealizedProfit ? '+' : ''}${formatUSD(stats.unrealizedPL, 2)}` : '0 USD'}
+            </span>
+          </div>
+
         </div>
 
         {/* Two white internal details grids */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-1">
-          
+
           {/* Box 1: GIÁ TRỊ HIỆN TẠI */}
           <div className="bg-white rounded-2xl border border-gray-100/80 p-5 flex flex-col gap-1.5 shadow-sm">
             <span className="text-gray-400 text-[10px] font-extrabold tracking-widest uppercase">
